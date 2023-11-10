@@ -5,34 +5,29 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.simulation.XboxControllerSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Constants.ShooterConstants;
 
 public class Robot extends TimedRobot {
-  private Command m_autonomousCommand;
-  CommandXboxController controller = new CommandXboxController(Constants.DRIVER_JOYSTICK_PORT);
+private Command m_autonomousCommand;
+private final CommandXboxController controller = new CommandXboxController(1);
+private final Shooter m_shooter;
 
-  private RobotContainer m_robotContainer;
-
-  private void configureBindings() {
-    Shooter shooter = new Shooter(1, 2, 3, 4, 5);
-    controller.rightTrigger().onTrue(new InstantCommand(() -> shooter.shoot()));
-    shooter.getCurrentCommand();
+  public Robot(){
+    m_shooter = new Shooter();
   }
 
   @Override
   public void robotInit() {
     configureBindings();
-    m_robotContainer = new RobotContainer();
   }
 
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
+    SmartDashboard.putString("Current Command", m_shooter.getCurrentCommand() != null ? m_shooter.getCurrentCommand().toString() : "");
   }
 
   @Override
@@ -49,7 +44,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
@@ -91,4 +85,10 @@ public class Robot extends TimedRobot {
   @Override
   public void testExit() {
   }
+
+  private void configureBindings() {
+    controller.a().onTrue(m_shooter.shoot());
+    controller.b().onTrue(m_shooter.idle());
+  }
+
 }

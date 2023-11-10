@@ -3,26 +3,36 @@ package frc.robot;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 
 public class Shooter extends SubsystemBase {
-    private CANSparkMax motor1, motor2, motor3, motor4, motor5;
+    private CANSparkMax m_leftRoller, m_rightRoller, m_flywheelMotorPrimary, m_flywheelMotorSecondary, m_flywheelTertiary;
 
-    public Shooter(int motor1ID, int motor2ID, int motor3ID, int motor4ID, int motor5ID) {
-        motor1 = new CANSparkMax(motor1ID, MotorType.kBrushless);
-        motor2 = new CANSparkMax(motor2ID, MotorType.kBrushless);
-        motor3 = new CANSparkMax(motor3ID, MotorType.kBrushless);
-        motor4 = new CANSparkMax(motor4ID, MotorType.kBrushless);
-        motor5 = new CANSparkMax(motor5ID, MotorType.kBrushless);
+    public Shooter() {
+        m_leftRoller = new CANSparkMax(0, MotorType.kBrushless);
+        m_rightRoller = new CANSparkMax(1, MotorType.kBrushless);
+        m_flywheelMotorPrimary = new CANSparkMax(2, MotorType.kBrushless);
+        m_flywheelMotorSecondary = new CANSparkMax(3, MotorType.kBrushless);
+        m_flywheelTertiary = new CANSparkMax(4, MotorType.kBrushless);
+        
+        m_flywheelMotorSecondary.follow(m_flywheelMotorPrimary);
+        m_flywheelTertiary.follow(m_flywheelMotorPrimary);
+        m_leftRoller.follow(m_rightRoller);
+        setDefaultCommand(idle());
     }
 
-    public void shoot() {
-        motor1.set(.1);
-        motor2.set(.1);
-        motor3.set(.1);
-        motor4.set(.1);
-        motor5.set(.1);
+    public Command shoot(){
+        return this.runOnce(() -> {
+            m_flywheelMotorPrimary.set(0.1);
+            m_rightRoller.set(0.5);
+        }).withName("shoot");
     }
 
+    public Command idle() {
+        return this.runOnce(() -> {
+            m_flywheelMotorPrimary.set(0);
+            m_rightRoller.set(0);
+        }).withName("Idle");
+    }
 }
