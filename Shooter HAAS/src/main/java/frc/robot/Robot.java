@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class Robot extends TimedRobot {
 private Command m_autonomousCommand;
-private final CommandXboxController controller = new CommandXboxController(1);
+private final CommandXboxController controller = new CommandXboxController(0);
 private final Shooter m_shooter;
 
   public Robot(){
@@ -27,7 +27,8 @@ private final Shooter m_shooter;
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
-    SmartDashboard.putString("Current Command", m_shooter.getCurrentCommand() != null ? m_shooter.getCurrentCommand().toString() : "");
+    SmartDashboard.putString("Current Command", m_shooter.getCurrentCommand() != null ? m_shooter.getCurrentCommand().getName() : "");
+    SmartDashboard.putNumber("Speed", m_shooter.getSpeed());
   }
 
   @Override

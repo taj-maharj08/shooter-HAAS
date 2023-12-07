@@ -12,6 +12,7 @@ public class Shooter extends SubsystemBase {
     private CANSparkMax m_leftRoller, m_rightRoller, m_flywheelMotorPrimary, m_flywheelMotorSecondary, m_flywheelTertiary;
     private SimpleMotorFeedforward feedforward;
     private final double goalVel = 5000;
+    private final double goalIdleVel = 0;
     public Shooter() {
         feedforward = new SimpleMotorFeedforward(0.1, 0.008, 0);
 
@@ -41,7 +42,8 @@ public class Shooter extends SubsystemBase {
 
     public Command idle() {
         return this.run(() -> {
-            m_flywheelMotorPrimary.set(0);
+            double ft = feedforward.calculate(goalIdleVel);
+            m_flywheelMotorPrimary.getPIDController().setReference(goalIdleVel, ControlType.kVelocity, 0, ft);
             m_rightRoller.set(0);
         }).withName("Idle");
     }
